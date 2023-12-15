@@ -9,9 +9,10 @@ from io import BytesIO
 from predictor import JSONToPandas, TickerDataFetcher, LinearClosePricePredictor
 from datetime import date
 
-
+# Create a Flask object
 app = Flask('stock-predictor')
 
+#
 @app.route('/<ticker>')
 def get_ticker(ticker):
     ticker_fetcher = TickerDataFetcher(ticker)
@@ -35,9 +36,9 @@ def get_ticker(ticker):
     ax = figure.subplots()
 
     #ax.plot(table.df['date'][0:5], table.df['2. high'][0:5],linestyle='dashed', color='blue')
-    ax.plot(table.df['date'][0:5], table.df['4. close'][0:5],color='green',linewidth=3)
-    ax.plot(table.df['date'][0:5], predictor.predicted_train[0:5],color='orange',linewidth=3)
-    ax.plot(table.df['date'][0:5], predictor.predicted_test[0:5],color='orange',linestyle='dashed',linewidth=3)
+    ax.plot(table.df['date'][0:5], table.df['4. close'][0:5],color='green',linewidth=3,label='Actual Closing Price')
+    ax.plot(table.df['date'][0:5], predictor.predicted_train[0:5],color='orange',linewidth=3,label='Train Closing Price')
+    ax.plot(table.df['date'][0:5], predictor.predicted_test[0:5],color='orange',linestyle='dashed',linewidth=3,label='Test Closing Price')
     #ax.plot(table.df['date'][0:5], table.df['3. low'][0:5],linestyle='dashed')
     ax.plot(date.today(), [float(prediction)], marker="o", markersize=20, color='green',)
     ax.text(date.today(), float(prediction), "Predicted price", horizontalalignment='center')
@@ -45,11 +46,22 @@ def get_ticker(ticker):
     ax.set_title('5-Day Performance',
             loc='left',
             size=18)
+    ax.legend(loc='upper left')
     buf = BytesIO()
     figure.savefig(buf, format="png")
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
+
+    # if predicted opening price is higher than actual opening price sell stock else buy
+    buy = "buy"
+    if prediction < table.df['1. open'][0]:
+        buy = "sell"
     
-    return render_template(prediction=prediction, chart=f"<img src='data:image/png;base64,{data}'/>")
+    wrong = "model is wrong"
+    if ((float(table.df['1. open'][0]) < float(table.df['4. close'][0])) and buy == "buy") or ((float(table.df['1. open'][0]) > float(table.df['4. close'][0])) and buy == "sell"):
+        wrong = "model is right"
+        
+    
+    return render_template("index.html", prediction=prediction, chart=f"data:image/png;base64,{data}", mse_train=predictor.mse, mse_test=predictor.msetest, buy=buy.upper(), wrong=wrong.upper())
      
 
 # Run our app!

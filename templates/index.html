@@ -5,7 +5,11 @@
     <title>Stock Price Predictor</title>
 </head>
 <body>
-    <p>{{prediction}}</p>
-    {{chart}}
+    <p>Predicted Closing Price: {{prediction}}</p>
+    <p>Mean Squared Error Train: {{mse_train}}</p>
+    <p>Mean Squared Error Test: {{mse_test}}</p>
+    <p>Buy or Sell: {{buy}}</p>
+    <p>{{wrong}}</p>
+    <img src={{chart}} alt="">
 </body>
 </html>

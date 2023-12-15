@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 
+# convert data in json format to pandas dataframe
 class JSONToPandas:
         
         def __init__(self,data):
@@ -21,7 +22,7 @@ class JSONToPandas:
                         return (f'Date: {self.df.index[0]}\n Closing Price: {self.df.iloc[:1, 3][0]}')
 
 
-
+# call API and store data
 class TickerDataFetcher:
 
         def __init__(self, ticker):
@@ -37,7 +38,7 @@ class TickerDataFetcher:
                 self.data = req.json()
                 return self.data
                 
-
+# train and test data to predict stock price
 class LinearClosePricePredictor:
 
         def __init__(self,df, transform=False):
