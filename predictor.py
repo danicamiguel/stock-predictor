@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn import metrics
 
 class JSONToPandas:
         
@@ -55,10 +56,12 @@ class LinearClosePricePredictor:
                                                    random_state=42)
                 lm = LinearRegression()
                 lm.fit(X_train,y_train)
-                y_train_pred = lm.predict(X_train)
-                y_test_pred = lm.predict(X_test)   
+                self.predicted_train = lm.predict(X_train)
+                self.predicted_test = lm.predict(X_test)   
                 self.coefficients = lm.coef_
                 self.intercept = lm.intercept_
+                self.mse = metrics.mean_squared_error(y_train, self.predicted_train)
+                self.msetest = metrics.mean_squared_error(y_test, self.predicted_test)
         
         def calculate_closing(self, open):
                 prediction = self.intercept + open*self.coefficients[0]

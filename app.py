@@ -34,9 +34,11 @@ def get_ticker(ticker):
     figure = Figure(figsize=(16,8))
     ax = figure.subplots()
 
-    ax.plot(table.df['date'][0:5], table.df['2. high'][0:5],linestyle='dashed', color='blue')
+    #ax.plot(table.df['date'][0:5], table.df['2. high'][0:5],linestyle='dashed', color='blue')
     ax.plot(table.df['date'][0:5], table.df['4. close'][0:5],color='green',linewidth=3)
-    ax.plot(table.df['date'][0:5], table.df['3. low'][0:5],linestyle='dashed')
+    ax.plot(table.df['date'][0:5], predictor.predicted_train[0:5],color='orange',linewidth=3)
+    ax.plot(table.df['date'][0:5], predictor.predicted_test[0:5],color='orange',linestyle='dashed',linewidth=3)
+    #ax.plot(table.df['date'][0:5], table.df['3. low'][0:5],linestyle='dashed')
     ax.plot(date.today(), [float(prediction)], marker="o", markersize=20, color='green',)
     ax.text(date.today(), float(prediction), "Predicted price", horizontalalignment='center')
     ax.set_ylabel('Price (USD)', size=14, rotation = 0, ha='right', labelpad=10)
