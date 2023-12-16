@@ -9,10 +9,11 @@ from io import BytesIO
 from predictor import JSONToPandas, TickerDataFetcher, LinearClosePricePredictor
 from datetime import date
 
+
 # Create a Flask object
 app = Flask('stock-predictor')
 
-#
+# add stock ticker
 @app.route('/<ticker>')
 def get_ticker(ticker):
     ticker_fetcher = TickerDataFetcher(ticker)
@@ -22,24 +23,27 @@ def get_ticker(ticker):
     predictor = LinearClosePricePredictor(table.df, False)
     predictor.predict(['1. open'], '4. close')
     
+    # get opening price input
+    # convert to float
     open_price = float(request.args.get('open'))
 
+    # predicted closing price output
     prediction = str(predictor.calculate_closing(open_price))
 
+    # convert date to pandas datetime
+    # convert close column from dataframe to float
     table.df['date'] = pd.to_datetime(table.df.index)
-    table.df['2. high'] = table.df['2. high'].astype(float)
     table.df['4. close'] = table.df['4. close'].astype(float)
-    table.df['3. low'] = table.df['3. low'].astype(float)
+ 
 
-
+    # creating graph to show actual closing price
+    # show training closing price
+    # show testing closing price
     figure = Figure(figsize=(16,8))
     ax = figure.subplots()
-
-    #ax.plot(table.df['date'][0:5], table.df['2. high'][0:5],linestyle='dashed', color='blue')
     ax.plot(table.df['date'][0:5], table.df['4. close'][0:5],color='green',linewidth=3,label='Actual Closing Price')
     ax.plot(table.df['date'][0:5], predictor.predicted_train[0:5],color='orange',linewidth=3,label='Train Closing Price')
     ax.plot(table.df['date'][0:5], predictor.predicted_test[0:5],color='orange',linestyle='dashed',linewidth=3,label='Test Closing Price')
-    #ax.plot(table.df['date'][0:5], table.df['3. low'][0:5],linestyle='dashed')
     ax.plot(date.today(), [float(prediction)], marker="o", markersize=20, color='green',)
     ax.text(date.today(), float(prediction), "Predicted price", horizontalalignment='center')
     ax.set_ylabel('Price (USD)', size=14, rotation = 0, ha='right', labelpad=10)
@@ -56,16 +60,15 @@ def get_ticker(ticker):
     if prediction < table.df['1. open'][0]:
         buy = "sell"
     
+    # check if model is accurate
     wrong = "model is wrong"
     if ((float(table.df['1. open'][0]) < float(table.df['4. close'][0])) and buy == "buy") or ((float(table.df['1. open'][0]) > float(table.df['4. close'][0])) and buy == "sell"):
         wrong = "model is right"
         
     
+    # produce graph image and predicted, training, and testing closing price
     return render_template("index.html", prediction=prediction, chart=f"data:image/png;base64,{data}", mse_train=predictor.mse, mse_test=predictor.msetest, buy=buy.upper(), wrong=wrong.upper())
      
 
 # Run our app!
 app.run()
-
-# Why? This tells us that we've made no errors
-print('Got to the end of my file!')

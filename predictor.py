@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn import metrics
 
-# convert data in json format to pandas dataframe
+# class that convert data in json format to pandas dataframe
 class JSONToPandas:
         
         def __init__(self,data):
@@ -16,7 +16,7 @@ class JSONToPandas:
                 self.df = df.T
 
 
-# call API and store data
+# class that calls API and store data
 class TickerDataFetcher:
 
         def __init__(self, ticker):
@@ -32,7 +32,9 @@ class TickerDataFetcher:
                 self.data = req.json()
                 return self.data
                 
-# train and test data to predict stock price
+# class that trains and tests data to predict stock price using linear regression
+# gets coefficients and y-intercept for opening price
+# finds mean squared erroers for training and testing
 class LinearClosePricePredictor:
 
         def __init__(self,df, transform=False):
@@ -58,6 +60,10 @@ class LinearClosePricePredictor:
                 self.mse = metrics.mean_squared_error(y_train, self.predicted_train)
                 self.msetest = metrics.mean_squared_error(y_test, self.predicted_test)
         
+        # using linear regression formula
+        # opening price is the independent variable
+        # predicted closing variable is the dependant variable
+        # plug in y-intercept and coefficients into formula
         def calculate_closing(self, open):
                 prediction = self.intercept + open*self.coefficients[0]
                 return prediction
