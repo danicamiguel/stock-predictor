@@ -15,12 +15,6 @@ class JSONToPandas:
                 df = pd.DataFrame(self.data)
                 self.df = df.T
 
-        def get_closing_price(self):
-                if not self.df.iloc[:1, 3][0]:        
-                        return (f'Date: {self.df.index[1]}\n Closing Price: {self.df.iloc[:1, 3][1]}')
-                else:
-                        return (f'Date: {self.df.index[0]}\n Closing Price: {self.df.iloc[:1, 3][0]}')
-
 
 # call API and store data
 class TickerDataFetcher:
